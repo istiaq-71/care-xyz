@@ -5,6 +5,8 @@ import { createBooking, getServiceById } from '@/lib/models'
 import { sendBookingInvoice } from '@/lib/email'
 import { getUserByEmail } from '@/lib/models'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)
