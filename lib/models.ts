@@ -106,9 +106,22 @@ export async function getServiceById(id: string): Promise<Service | null> {
 }
 
 export async function getAllServices(): Promise<Service[]> {
-  const client = await getDb()
-  const db = client.db('care')
-  return await db.collection<Service>('services').find({}).toArray()
+  try {
+    // Check if MongoDB URI is configured
+    if (!process.env.MONGODB_URI) {
+      console.error('MONGODB_URI is not configured')
+      return []
+    }
+    
+    const client = await getDb()
+    const db = client.db('care')
+    const services = await db.collection<Service>('services').find({}).toArray()
+    return services
+  } catch (error: any) {
+    console.error('Error in getAllServices:', error)
+    // Return empty array instead of throwing to prevent page crashes
+    return []
+  }
 }
 
 export async function createBooking(booking: Omit<Booking, '_id'>): Promise<Booking> {
