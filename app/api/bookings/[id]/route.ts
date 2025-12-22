@@ -7,9 +7,10 @@ export const dynamic = 'force-dynamic'
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.email) {
@@ -27,7 +28,7 @@ export async function PATCH(
       )
     }
 
-    const booking = await getBookingById(params.id)
+    const booking = await getBookingById(id)
     if (!booking) {
       return NextResponse.json(
         { error: 'Booking not found' },
@@ -53,7 +54,7 @@ export async function PATCH(
       )
     }
 
-    const updated = await updateBookingStatus(params.id, status)
+    const updated = await updateBookingStatus(id, status)
 
     if (!updated) {
       return NextResponse.json(

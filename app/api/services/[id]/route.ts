@@ -5,10 +5,11 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const service = await getServiceById(params.id)
+    const { id } = await params
+    const service = await getServiceById(id)
     
     if (!service) {
       return NextResponse.json(
