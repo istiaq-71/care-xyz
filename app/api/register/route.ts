@@ -72,9 +72,27 @@ export async function POST(request: Request) {
     )
   } catch (error: any) {
     console.error('Registration error:', error)
-    const errorMessage = error?.message || 'Internal server error'
+    console.error('Error stack:', error?.stack)
+    console.error('Error details:', {
+      message: error?.message,
+      name: error?.name,
+      code: error?.code,
+    })
+    
+    // Return more detailed error in development
+    const errorMessage = process.env.NODE_ENV === 'development' 
+      ? `${error?.message || 'Internal server error'} (${error?.name || 'Unknown'})`
+      : 'Internal server error. Please check server logs.'
+    
     return NextResponse.json(
-      { error: errorMessage },
+      { 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? {
+          name: error?.name,
+          code: error?.code,
+          message: error?.message,
+        } : undefined,
+      },
       { status: 500 }
     )
   }

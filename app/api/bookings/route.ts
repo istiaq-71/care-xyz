@@ -106,10 +106,26 @@ export async function POST(request: Request) {
       { message: 'Booking created successfully', booking },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating booking:', error)
+    console.error('Error details:', {
+      message: error?.message,
+      name: error?.name,
+      code: error?.code,
+    })
+    
+    const errorMessage = process.env.NODE_ENV === 'development'
+      ? `Error: ${error?.message || 'Internal server error'}`
+      : 'Internal server error'
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? {
+          name: error?.name,
+          code: error?.code,
+        } : undefined,
+      },
       { status: 500 }
     )
   }
