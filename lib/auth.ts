@@ -13,25 +13,30 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            return null
+          }
 
-        const user = await getUserByEmail(credentials.email)
-        if (!user || !user.password) {
-          return null
-        }
+          const user = await getUserByEmail(credentials.email)
+          if (!user || !user.password) {
+            return null
+          }
 
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
-        if (!isPasswordValid) {
-          return null
-        }
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
+          if (!isPasswordValid) {
+            return null
+          }
 
-        return {
-          id: user._id?.toString() || '',
-          email: user.email,
-          name: user.name,
-          image: user.image,
+          return {
+            id: user._id?.toString() || '',
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          }
+        } catch (error) {
+          console.error('Authorization error:', error)
+          return null
         }
       },
     }),
@@ -42,17 +47,23 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === 'google') {
-        const existingUser = await getUserByEmail(user.email || '')
-        if (!existingUser) {
-          await createUser({
-            name: user.name || '',
-            email: user.email || '',
-            image: user.image || undefined,
-          })
+      try {
+        if (account?.provider === 'google') {
+          const existingUser = await getUserByEmail(user.email || '')
+          if (!existingUser) {
+            await createUser({
+              name: user.name || '',
+              email: user.email || '',
+              image: user.image || undefined,
+            })
+          }
         }
+        return true
+      } catch (error) {
+        console.error('SignIn callback error:', error)
+        // Don't block sign in if database error occurs
+        return true
       }
-      return true
     },
     async jwt({ token, user }) {
       if (user) {
@@ -61,14 +72,24 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      if (session.user && token) {
-        session.user.id = token.id as string
-        const user = await getUserByEmail(session.user.email || '')
-        if (user) {
-          session.user.id = user._id?.toString() || ''
+      try {
+        if (session.user && token) {
+          session.user.id = token.id as string
+          try {
+            const user = await getUserByEmail(session.user.email || '')
+            if (user) {
+              session.user.id = user._id?.toString() || ''
+            }
+          } catch (error) {
+            console.error('Error fetching user in session callback:', error)
+            // Keep the token id if database lookup fails
+          }
         }
+        return session
+      } catch (error) {
+        console.error('Session callback error:', error)
+        return session
       }
-      return session
     },
   },
   pages: {
@@ -77,6 +98,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-key-change-in-production',
+  debug: process.env.NODE_ENV === 'development',
 }
 

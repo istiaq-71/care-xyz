@@ -53,12 +53,23 @@ export interface Booking {
 
 export async function getUserByEmail(email: string): Promise<User | null> {
   try {
+    if (!email) {
+      return null
+    }
+    
+    // Check if MongoDB URI is configured
+    if (!process.env.MONGODB_URI) {
+      console.error('MONGODB_URI is not configured')
+      throw new Error('Database not configured')
+    }
+    
     const client = await getDb()
     const db = client.db('care')
     return await db.collection<User>('users').findOne({ email })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in getUserByEmail:', error)
-    throw error
+    // Re-throw with more context
+    throw new Error(`Database error: ${error.message || 'Unknown error'}`)
   }
 }
 
