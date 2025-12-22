@@ -12,8 +12,16 @@ export const metadata = {
   },
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
-  const services = await getAllServices()
+  let services: Awaited<ReturnType<typeof getAllServices>> = []
+  try {
+    services = await getAllServices()
+  } catch (error) {
+    console.error('Error fetching services:', error)
+    // Fallback to default services if DB connection fails
+  }
 
   return (
     <div>

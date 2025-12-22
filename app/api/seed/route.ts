@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import clientPromise from '@/lib/db'
 import { Service } from '@/lib/models'
 
+export const dynamic = 'force-dynamic'
+
 // This is a utility route to seed initial services
 // You can call this once to populate your database
 export async function GET() {
