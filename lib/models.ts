@@ -2,8 +2,10 @@ import { ObjectId } from 'mongodb'
 
 // Lazy import to avoid build-time errors
 async function getDb() {
-  const { default: clientPromise } = await import('./db')
-  return clientPromise
+  const dbModule = await import('./db')
+  const clientPromise = dbModule.default
+  const client = await clientPromise
+  return client
 }
 
 export interface User {
@@ -50,37 +52,32 @@ export interface Booking {
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const clientPromise = await getDb()
-  const client = await clientPromise
+  const client = await getDb()
   const db = client.db('care')
   return await db.collection<User>('users').findOne({ email })
 }
 
 export async function createUser(user: Omit<User, '_id'>): Promise<User> {
-  const clientPromise = await getDb()
-  const client = await clientPromise
+  const client = await getDb()
   const db = client.db('care')
   const result = await db.collection<User>('users').insertOne(user as any)
   return { ...user, _id: result.insertedId }
 }
 
 export async function getServiceById(id: string): Promise<Service | null> {
-  const clientPromise = await getDb()
-  const client = await clientPromise
+  const client = await getDb()
   const db = client.db('care')
   return await db.collection<Service>('services').findOne({ _id: new ObjectId(id) })
 }
 
 export async function getAllServices(): Promise<Service[]> {
-  const clientPromise = await getDb()
-  const client = await clientPromise
+  const client = await getDb()
   const db = client.db('care')
   return await db.collection<Service>('services').find({}).toArray()
 }
 
 export async function createBooking(booking: Omit<Booking, '_id'>): Promise<Booking> {
-  const clientPromise = await getDb()
-  const client = await clientPromise
+  const client = await getDb()
   const db = client.db('care')
   const bookingData = {
     ...booking,
@@ -92,8 +89,7 @@ export async function createBooking(booking: Omit<Booking, '_id'>): Promise<Book
 }
 
 export async function getBookingsByUserId(userId: string): Promise<Booking[]> {
-  const clientPromise = await getDb()
-  const client = await clientPromise
+  const client = await getDb()
   const db = client.db('care')
   return await db.collection<Booking>('bookings')
     .find({ userId: new ObjectId(userId) })
@@ -102,8 +98,7 @@ export async function getBookingsByUserId(userId: string): Promise<Booking[]> {
 }
 
 export async function getBookingById(id: string): Promise<Booking | null> {
-  const clientPromise = await getDb()
-  const client = await clientPromise
+  const client = await getDb()
   const db = client.db('care')
   return await db.collection<Booking>('bookings').findOne({ _id: new ObjectId(id) })
 }
@@ -112,8 +107,7 @@ export async function updateBookingStatus(
   id: string,
   status: Booking['status']
 ): Promise<boolean> {
-  const clientPromise = await getDb()
-  const client = await clientPromise
+  const client = await getDb()
   const db = client.db('care')
   const result = await db.collection<Booking>('bookings').updateOne(
     { _id: new ObjectId(id) },

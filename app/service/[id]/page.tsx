@@ -3,6 +3,8 @@ import { getServiceById } from '@/lib/models'
 import Link from 'next/link'
 import { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: {
     id: string
@@ -10,27 +12,39 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const service = await getServiceById(params.id)
-  
-  if (!service) {
-    return {
-      title: 'Service Not Found - Care.xyz',
+  try {
+    const service = await getServiceById(params.id)
+    
+    if (!service) {
+      return {
+        title: 'Service Not Found - Care.xyz',
+      }
     }
-  }
 
-  return {
-    title: `${service.name} - Care.xyz`,
-    description: service.description,
-    openGraph: {
+    return {
       title: `${service.name} - Care.xyz`,
       description: service.description,
-      type: 'website',
-    },
+      openGraph: {
+        title: `${service.name} - Care.xyz`,
+        description: service.description,
+        type: 'website',
+      },
+    }
+  } catch (error) {
+    return {
+      title: 'Service - Care.xyz',
+    }
   }
 }
 
 export default async function ServiceDetailPage({ params }: PageProps) {
-  const service = await getServiceById(params.id)
+  let service
+  try {
+    service = await getServiceById(params.id)
+  } catch (error) {
+    console.error('Error fetching service:', error)
+    notFound()
+  }
 
   if (!service) {
     notFound()
