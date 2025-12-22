@@ -40,6 +40,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ServiceDetailPage({ params }: PageProps) {
   const { id } = await params
+  
+  // Validate id
+  if (!id || id === '1' || id === 'undefined') {
+    console.error('Invalid service ID:', id)
+    notFound()
+  }
+
   let service
   try {
     service = await getServiceById(id)
@@ -49,6 +56,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   }
 
   if (!service) {
+    console.error('Service not found for ID:', id)
     notFound()
   }
 

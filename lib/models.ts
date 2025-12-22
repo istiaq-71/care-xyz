@@ -52,22 +52,46 @@ export interface Booking {
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const client = await getDb()
-  const db = client.db('care')
-  return await db.collection<User>('users').findOne({ email })
+  try {
+    const client = await getDb()
+    const db = client.db('care')
+    return await db.collection<User>('users').findOne({ email })
+  } catch (error) {
+    console.error('Error in getUserByEmail:', error)
+    throw error
+  }
 }
 
 export async function createUser(user: Omit<User, '_id'>): Promise<User> {
-  const client = await getDb()
-  const db = client.db('care')
-  const result = await db.collection<User>('users').insertOne(user as any)
-  return { ...user, _id: result.insertedId }
+  try {
+    const client = await getDb()
+    const db = client.db('care')
+    const userData = {
+      ...user,
+      createdAt: new Date(),
+    }
+    const result = await db.collection<User>('users').insertOne(userData as any)
+    return { ...userData, _id: result.insertedId }
+  } catch (error) {
+    console.error('Error in createUser:', error)
+    throw error
+  }
 }
 
 export async function getServiceById(id: string): Promise<Service | null> {
-  const client = await getDb()
-  const db = client.db('care')
-  return await db.collection<Service>('services').findOne({ _id: new ObjectId(id) })
+  try {
+    // Validate ObjectId format
+    if (!ObjectId.isValid(id)) {
+      console.error('Invalid ObjectId:', id)
+      return null
+    }
+    const client = await getDb()
+    const db = client.db('care')
+    return await db.collection<Service>('services').findOne({ _id: new ObjectId(id) })
+  } catch (error) {
+    console.error('Error in getServiceById:', error)
+    return null
+  }
 }
 
 export async function getAllServices(): Promise<Service[]> {

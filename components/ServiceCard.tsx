@@ -9,7 +9,29 @@ interface ServiceCardProps {
 }
 
 export default function ServiceCard({ service }: ServiceCardProps) {
-  const serviceId = service._id?.toString() || '1'
+  // Don't render link if service doesn't have a valid ID
+  if (!service._id) {
+    return (
+      <div className="group bg-white rounded-2xl shadow-lg overflow-hidden animate-fadeIn">
+        <div className={`h-56 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center relative overflow-hidden`}>
+          <span className="text-7xl z-10">💚</span>
+        </div>
+        <div className="p-6">
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">{service.name}</h3>
+          <p className="text-gray-600 mb-6 line-clamp-2 min-h-[3rem]">{service.description}</p>
+          <div className="flex items-baseline">
+            <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+              ৳{service.serviceCharge}
+            </span>
+            <span className="text-gray-500 ml-2">/hour</span>
+          </div>
+          <div className="mt-4 text-center text-gray-500 text-sm">Service not available for booking</div>
+        </div>
+      </div>
+    )
+  }
+  
+  const serviceId = service._id.toString()
   const [isHovered, setIsHovered] = useState(false)
   
   const categoryIcons: Record<string, string> = {
