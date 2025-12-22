@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import clientPromise from '@/lib/db'
 import { Service } from '@/lib/models'
 
 export const dynamic = 'force-dynamic'
@@ -8,6 +7,7 @@ export const dynamic = 'force-dynamic'
 // You can call this once to populate your database
 export async function GET() {
   try {
+    const { default: clientPromise } = await import('@/lib/db')
     const client = await clientPromise
     const db = client.db('care')
     const servicesCollection = db.collection<Service>('services')
