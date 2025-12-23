@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     nid: '',
     name: '',
@@ -65,8 +66,14 @@ export default function RegisterPage() {
       const data = await response.json()
 
       if (response.ok) {
-        toast.success('Registration successful! Please login.')
-        router.push('/login')
+        toast.success('Registration successful! Redirecting to login...')
+        // If user came from booking page, redirect back to booking after login
+        const callbackUrl = searchParams.get('callbackUrl')
+        if (callbackUrl) {
+          router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`)
+        } else {
+          router.push('/login')
+        }
       } else {
         toast.error(data.error || 'Registration failed')
         if (data.errors) {
@@ -203,6 +210,18 @@ export default function RegisterPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   )
 }
 
