@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import PrivateRoute from '@/components/PrivateRoute'
 import Link from 'next/link'
@@ -26,13 +26,7 @@ interface Booking {
 export default function MyBookingsPage() {
   return (
     <PrivateRoute>
-      <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
-      }>
-        <MyBookingsContent />
-      </Suspense>
+      <MyBookingsContent />
     </PrivateRoute>
   )
 }

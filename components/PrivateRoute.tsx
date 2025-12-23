@@ -1,26 +1,26 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
     // Only redirect if we're sure the user is not authenticated
     if (status === 'unauthenticated' && !isRedirecting) {
       setIsRedirecting(true)
-      // Preserve the current path as callbackUrl
-      const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '')
+      // Preserve the current path as callbackUrl (including search params from window.location)
+      const searchParams = typeof window !== 'undefined' ? window.location.search : ''
+      const currentPath = pathname + searchParams
       const callbackUrl = encodeURIComponent(currentPath || '/')
       router.push(`/login?callbackUrl=${callbackUrl}`)
     }
-  }, [status, router, pathname, searchParams, isRedirecting])
+  }, [status, router, pathname, isRedirecting])
 
   // Show loading while checking session
   if (status === 'loading') {
