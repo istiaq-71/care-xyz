@@ -61,14 +61,28 @@ export default function ServiceCard({ service }: ServiceCardProps) {
         animationDelay: `${Math.random() * 0.3}s`,
       }}
     >
-      <div className={`h-56 bg-gradient-to-br ${isHovered ? categoryHoverGradients[service.category] : categoryGradients[service.category]} flex items-center justify-center relative overflow-hidden transition-all duration-500`}>
-        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
-        <span 
-          className={`text-7xl z-10 transition-transform duration-500 ${isHovered ? 'scale-125 rotate-12' : 'scale-100 rotate-0'} animate-float`}
-          style={{ animationDelay: '0.2s' }}
-        >
-          {categoryIcons[service.category] || '💚'}
-        </span>
+      <div className={`h-56 relative overflow-hidden transition-all duration-500`}>
+        {service.image ? (
+          <>
+            <img 
+              src={service.image} 
+              alt={service.name}
+              className={`w-full h-full object-cover transition-transform duration-500 ${isHovered ? 'scale-110' : 'scale-100'}`}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+          </>
+        ) : (
+          <div className={`h-full bg-gradient-to-br ${isHovered ? categoryHoverGradients[service.category] : categoryGradients[service.category]} flex items-center justify-center relative`}>
+            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+            <span 
+              className={`text-7xl z-10 transition-transform duration-500 ${isHovered ? 'scale-125 rotate-12' : 'scale-100 rotate-0'} animate-float`}
+              style={{ animationDelay: '0.2s' }}
+            >
+              {categoryIcons[service.category] || '💚'}
+            </span>
+          </div>
+        )}
         <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs font-semibold">
           {service.category === 'baby-care' ? 'Baby Care' : service.category === 'elderly-care' ? 'Elderly Care' : 'Special Care'}
         </div>

@@ -33,6 +33,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             image: user.image,
+            role: user.role || 'user',
           }
         } catch (error) {
           console.error('Authorization error:', error)
@@ -68,6 +69,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+        token.role = (user as any).role || 'user'
       }
       return token
     },
@@ -75,10 +77,12 @@ export const authOptions: NextAuthOptions = {
       try {
         if (session.user && token) {
           session.user.id = token.id as string
+          session.user.role = (token.role as string) || 'user'
           try {
             const user = await getUserByEmail(session.user.email || '')
             if (user) {
               session.user.id = user._id?.toString() || ''
+              session.user.role = user.role || 'user'
             }
           } catch (error) {
             console.error('Error fetching user in session callback:', error)

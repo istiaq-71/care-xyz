@@ -12,10 +12,18 @@ export async function GET() {
     const db = client.db('care')
     const servicesCollection = db.collection<Service>('services')
 
-    // Check if services already exist
+    // Check if services already exist - if they do, update them with images
     const existingServices = await servicesCollection.countDocuments()
     if (existingServices > 0) {
-      return NextResponse.json({ message: 'Services already exist' })
+      // Update existing services with images if they don't have them
+      for (const service of services) {
+        await servicesCollection.updateOne(
+          { name: service.name },
+          { $set: { image: service.image } },
+          { upsert: false }
+        )
+      }
+      return NextResponse.json({ message: 'Services updated with images', count: existingServices })
     }
 
     const services: Omit<Service, '_id'>[] = [
@@ -25,6 +33,7 @@ export async function GET() {
         description: 'Professional babysitting services for your children. Experienced and caring babysitters available for day and night care.',
         descriptionBn: 'আপনার সন্তানদের জন্য পেশাদার বেবিসিটারিং সেবা। দিন ও রাতের যত্নের জন্য অভিজ্ঞ এবং যত্নশীল বেবিসিটার উপলব্ধ।',
         serviceCharge: 500,
+        image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600&fit=crop',
         category: 'baby-care',
         createdAt: new Date(),
       },
@@ -34,6 +43,7 @@ export async function GET() {
         description: 'Compassionate care services for elderly family members. Trained caregivers for daily assistance, medication management, and companionship.',
         descriptionBn: 'বৃদ্ধ পরিবারের সদস্যদের জন্য সহানুভূতিশীল যত্ন সেবা। দৈনন্দিন সহায়তা, ওষুধ ব্যবস্থাপনা এবং সঙ্গের জন্য প্রশিক্ষিত যত্নকারী।',
         serviceCharge: 800,
+        image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&h=600&fit=crop',
         category: 'elderly-care',
         createdAt: new Date(),
       },
@@ -43,6 +53,7 @@ export async function GET() {
         description: 'Specialized care services for sick or disabled family members. Medical assistance, physical therapy support, and round-the-clock care available.',
         descriptionBn: 'অসুস্থ বা প্রতিবন্ধী পরিবারের সদস্যদের জন্য বিশেষায়িত যত্ন সেবা। চিকিৎসা সহায়তা, ফিজিওথেরাপি সহায়তা এবং চব্বিশ ঘণ্টা যত্ন উপলব্ধ।',
         serviceCharge: 1000,
+        image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600&fit=crop',
         category: 'sick-care',
         createdAt: new Date(),
       },

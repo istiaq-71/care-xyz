@@ -16,6 +16,7 @@ export interface User {
   contact?: string
   password?: string
   image?: string
+  role?: 'user' | 'admin'
   createdAt?: Date
 }
 
@@ -162,5 +163,33 @@ export async function updateBookingStatus(
     { $set: { status, updatedAt: new Date() } }
   )
   return result.modifiedCount > 0
+}
+
+export async function getAllBookings(): Promise<Booking[]> {
+  try {
+    const client = await getDb()
+    const db = client.db('care')
+    return await db.collection<Booking>('bookings')
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray()
+  } catch (error) {
+    console.error('Error in getAllBookings:', error)
+    return []
+  }
+}
+
+export async function getUserById(userId: string): Promise<User | null> {
+  try {
+    if (!ObjectId.isValid(userId)) {
+      return null
+    }
+    const client = await getDb()
+    const db = client.db('care')
+    return await db.collection<User>('users').findOne({ _id: new ObjectId(userId) })
+  } catch (error) {
+    console.error('Error in getUserById:', error)
+    return null
+  }
 }
 

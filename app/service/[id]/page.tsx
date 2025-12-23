@@ -83,11 +83,25 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500">
           <div className="md:flex">
-            <div className={`md:w-1/2 bg-gradient-to-br ${categoryGradients[service.category]} flex items-center justify-center p-12 relative overflow-hidden group`}>
-              <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
-              <span className="text-9xl z-10 transform group-hover:scale-125 transition-transform duration-500 animate-float">
-                {categoryIcons[service.category] || '💚'}
-              </span>
+            <div className={`md:w-1/2 relative overflow-hidden group`}>
+              {service.image ? (
+                <>
+                  <img 
+                    src={service.image} 
+                    alt={service.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+                </>
+              ) : (
+                <div className={`h-full bg-gradient-to-br ${categoryGradients[service.category]} flex items-center justify-center p-12 relative`}>
+                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                  <span className="text-9xl z-10 transform group-hover:scale-125 transition-transform duration-500 animate-float">
+                    {categoryIcons[service.category] || '💚'}
+                  </span>
+                </div>
+              )}
               <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm font-semibold">
                 {categoryNames[service.category]}
               </div>

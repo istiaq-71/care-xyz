@@ -1,5 +1,7 @@
 import 'next-auth'
 
+import 'next-auth'
+
 declare module 'next-auth' {
   interface Session {
     user: {
@@ -7,7 +9,18 @@ declare module 'next-auth' {
       email: string
       name: string
       image?: string
+      role?: 'user' | 'admin'
     }
+  }
+
+  interface User {
+    role?: 'user' | 'admin'
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    role?: 'user' | 'admin'
   }
 }
 
