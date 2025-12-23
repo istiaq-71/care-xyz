@@ -126,24 +126,45 @@ export async function getAllServices(): Promise<Service[]> {
 }
 
 export async function createBooking(booking: Omit<Booking, '_id'>): Promise<Booking> {
-  const client = await getDb()
-  const db = client.db('care')
-  const bookingData = {
-    ...booking,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+  try {
+    const client = await getDb()
+    const db = client.db('care')
+    const bookingData = {
+      ...booking,
+      userId: new ObjectId(booking.userId), // Convert userId to ObjectId
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    const result = await db.collection<Booking>('bookings').insertOne(bookingData as any)
+    return { ...bookingData, _id: result.insertedId }
+  } catch (error) {
+    console.error('Error in createBooking:', error)
+    throw error
   }
-  const result = await db.collection<Booking>('bookings').insertOne(bookingData as any)
-  return { ...bookingData, _id: result.insertedId }
 }
 
 export async function getBookingsByUserId(userId: string): Promise<Booking[]> {
-  const client = await getDb()
-  const db = client.db('care')
-  return await db.collection<Booking>('bookings')
-    .find({ userId: new ObjectId(userId) })
-    .sort({ createdAt: -1 })
-    .toArray()
+  try {
+    const client = await getDb()
+    const db = client.db('care')
+    
+    // Try both ObjectId and string format to handle existing data
+    const userIdObj = ObjectId.isValid(userId) ? new ObjectId(userId) : userId
+    const bookings = await db.collection<Booking>('bookings')
+      .find({ 
+        $or: [
+          { userId: userIdObj },
+          { userId: userId }
+        ]
+      })
+      .sort({ createdAt: -1 })
+      .toArray()
+    
+    return bookings
+  } catch (error) {
+    console.error('Error in getBookingsByUserId:', error)
+    return []
+  }
 }
 
 export async function getBookingById(id: string): Promise<Booking | null> {

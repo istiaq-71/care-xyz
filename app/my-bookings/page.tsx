@@ -45,11 +45,15 @@ function MyBookingsContent() {
       const response = await fetch('/api/bookings')
       if (response.ok) {
         const data = await response.json()
-        setBookings(data)
+        console.log('Fetched bookings:', data)
+        setBookings(data || [])
       } else {
-        toast.error('Failed to load bookings')
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Failed to load bookings:', errorData)
+        toast.error(errorData.error || 'Failed to load bookings')
       }
     } catch (error) {
+      console.error('Error fetching bookings:', error)
       toast.error('Something went wrong')
     } finally {
       setLoading(false)

@@ -28,6 +28,9 @@ export async function GET() {
 
     const { getBookingsByUserId } = await import('@/lib/models')
     const bookings = await getBookingsByUserId(user._id.toString())
+    
+    console.log('User ID:', user._id.toString())
+    console.log('Found bookings:', bookings.length)
 
     return NextResponse.json(bookings)
   } catch (error) {
@@ -78,6 +81,7 @@ export async function POST(request: Request) {
     }
 
     // Create booking
+    console.log('Creating booking for user:', user._id.toString())
     const booking = await createBooking({
       userId: user._id.toString(),
       serviceId,
@@ -88,6 +92,7 @@ export async function POST(request: Request) {
       totalCost,
       status: 'pending',
     })
+    console.log('Booking created:', booking._id)
 
     // Send email invoice
     try {
