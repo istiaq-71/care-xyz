@@ -29,10 +29,18 @@ function LoginForm() {
         toast.error('Invalid email or password')
       } else {
         toast.success('Login successful!')
+        // Wait a bit for session to be established
+        await new Promise(resolve => setTimeout(resolve, 100))
         // Check if user is already logged in to prevent redirect
         const session = await getSession()
         if (session) {
-          router.push(callbackUrl)
+          // Decode callbackUrl if it's encoded
+          const decodedUrl = callbackUrl.startsWith('/') ? callbackUrl : decodeURIComponent(callbackUrl)
+          router.push(decodedUrl)
+          router.refresh()
+        } else {
+          // Fallback to home if session not ready
+          router.push('/')
           router.refresh()
         }
       }
