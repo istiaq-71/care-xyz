@@ -31,6 +31,11 @@ export default function Navbar() {
                 <Link href="/my-bookings" className="text-gray-700 hover:text-primary-600 transition">
                   My Bookings
                 </Link>
+                {(session?.user as any)?.role === 'admin' && (
+                  <Link href="/admin" className="text-gray-700 hover:text-primary-600 transition font-semibold">
+                    Admin
+                  </Link>
+                )}
                 <div className="flex items-center space-x-4">
                   <span className="text-gray-700">Hello, {session?.user?.name}</span>
                   <button
@@ -87,6 +92,11 @@ export default function Navbar() {
             </Link>
             {status === 'authenticated' ? (
               <>
+                {(session?.user as any)?.role === 'admin' && (
+                  <Link href="/admin" className="block text-gray-700 hover:text-primary-600 font-semibold">
+                    Admin Panel
+                  </Link>
+                )}
                 <Link href="/my-bookings" className="block text-gray-700 hover:text-primary-600">
                   My Bookings
                 </Link>

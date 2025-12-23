@@ -12,20 +12,9 @@ export async function GET() {
     const db = client.db('care')
     const servicesCollection = db.collection<Service>('services')
 
-    // Check if services already exist - if they do, update them with images
+    // Always update services with images
     const existingServices = await servicesCollection.countDocuments()
-    if (existingServices > 0) {
-      // Update existing services with images if they don't have them
-      for (const service of services) {
-        await servicesCollection.updateOne(
-          { name: service.name },
-          { $set: { image: service.image } },
-          { upsert: false }
-        )
-      }
-      return NextResponse.json({ message: 'Services updated with images', count: existingServices })
-    }
-
+    
     const services: Omit<Service, '_id'>[] = [
       {
         name: 'Baby Care',
@@ -59,6 +48,32 @@ export async function GET() {
       },
     ]
 
+    if (existingServices > 0) {
+      // Update existing services with images
+      let updated = 0
+      for (const service of services) {
+        const result = await servicesCollection.updateOne(
+          { name: service.name },
+          { 
+            $set: { 
+              image: service.image,
+              serviceCharge: service.serviceCharge,
+              description: service.description,
+              descriptionBn: service.descriptionBn,
+            } 
+          },
+          { upsert: false }
+        )
+        if (result.modifiedCount > 0) updated++
+      }
+      return NextResponse.json({ 
+        message: 'Services updated with images', 
+        existing: existingServices,
+        updated: updated 
+      })
+    }
+
+    // Insert new services
     await servicesCollection.insertMany(services as any)
 
     return NextResponse.json({ message: 'Services seeded successfully', count: services.length })
