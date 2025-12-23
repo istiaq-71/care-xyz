@@ -41,13 +41,31 @@ EMAIL_PASS=your-gmail-app-password
 - `NEXTAUTH_URL` = আপনার Vercel URL (deploy হওয়ার পর পাবেন)
 - সব variables "Production", "Preview", "Development" সব environment-এ add করুন
 
-### Step 4: Google OAuth Redirect URI Update করুন
-1. Google Cloud Console-এ যান
-2. OAuth credentials-এ যান
-3. Authorized redirect URIs-এ add করুন:
+### Step 4: Google OAuth Redirect URI Update করুন ⚠️ **খুবই গুরুত্বপূর্ণ**
+
+1. Google Cloud Console-এ যান: https://console.cloud.google.com/
+2. আপনার project select করুন
+3. **APIs & Services** → **Credentials** এ যান
+4. আপনার OAuth 2.0 Client ID click করুন
+5. **Authorized redirect URIs** section-এ **দুইটি URI add করুন:**
+
+   **Local Development:**
+   ```
+   http://localhost:3000/api/auth/callback/google
+   ```
+
+   **Vercel Production (আপনার Vercel URL):**
    ```
    https://your-app-name.vercel.app/api/auth/callback/google
    ```
+
+6. **Save** button click করুন
+7. **5-10 minutes** অপেক্ষা করুন (Google-এর settings update হতে সময় লাগে)
+
+**⚠️ গুরুত্বপূর্ণ:** 
+- দুটো URI-ই add করতে হবে (localhost এবং Vercel URL)
+- Exact URL match করতে হবে (no trailing slash, no extra spaces)
+- Settings save করার পর কিছুক্ষণ অপেক্ষা করতে হবে
 
 ### Step 5: Deploy করুন
 1. "Deploy" বাটন ক্লিক করুন
