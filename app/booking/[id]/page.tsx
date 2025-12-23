@@ -161,13 +161,13 @@ function BookingPageContent() {
                   min="1"
                   value={formData.duration}
                   onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 1 })}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900"
                   required
                 />
                 <select
                   value={formData.durationType}
                   onChange={(e) => setFormData({ ...formData, durationType: e.target.value as 'hours' | 'days' })}
-                  className="px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  className="px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900"
                 >
                   <option value="hours">Hours</option>
                   <option value="days">Days</option>
@@ -184,7 +184,7 @@ function BookingPageContent() {
                 <select
                   value={formData.division}
                   onChange={(e) => setFormData({ ...formData, division: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900"
                   required
                 >
                   <option value="">Select Division</option>
@@ -201,7 +201,7 @@ function BookingPageContent() {
                 <select
                   value={formData.district}
                   onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900 disabled:bg-gray-100 disabled:text-gray-500"
                   required
                   disabled={!formData.division}
                 >
@@ -219,7 +219,7 @@ function BookingPageContent() {
                 <select
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900 disabled:bg-gray-100 disabled:text-gray-500"
                   required
                   disabled={!formData.district}
                 >
@@ -238,7 +238,7 @@ function BookingPageContent() {
                   type="text"
                   value={formData.area}
                   onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900 placeholder:text-gray-400"
                   placeholder="Enter area name"
                   required
                 />
@@ -252,7 +252,7 @@ function BookingPageContent() {
               <textarea
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900 placeholder:text-gray-400"
                 rows={3}
                 placeholder="Enter your full address"
                 required
@@ -260,27 +260,27 @@ function BookingPageContent() {
             </div>
 
             {/* Cost Summary */}
-            <div className="bg-primary-50 p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-primary-50 to-purple-50 p-6 rounded-lg border border-primary-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking Summary</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Service:</span>
-                  <span className="font-medium">{service.name}</span>
+                  <span className="text-gray-700 font-medium">Service:</span>
+                  <span className="font-semibold text-gray-900">{service.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Duration:</span>
-                  <span className="font-medium">
+                  <span className="text-gray-700 font-medium">Duration:</span>
+                  <span className="font-semibold text-gray-900">
                     {formData.duration} {formData.durationType}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Service Charge:</span>
-                  <span className="font-medium">৳{service.serviceCharge}/{formData.durationType === 'hours' ? 'hour' : 'day'}</span>
+                  <span className="text-gray-700 font-medium">Service Charge:</span>
+                  <span className="font-semibold text-gray-900">৳{service.serviceCharge}/{formData.durationType === 'hours' ? 'hour' : 'day'}</span>
                 </div>
-                <div className="border-t border-primary-200 pt-2 mt-2">
-                  <div className="flex justify-between">
-                    <span className="text-lg font-semibold text-gray-900">Total Cost:</span>
-                    <span className="text-2xl font-bold text-primary-600">৳{calculateTotalCost()}</span>
+                <div className="border-t border-primary-300 pt-3 mt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-900">Total Cost:</span>
+                    <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">৳{calculateTotalCost()}</span>
                   </div>
                 </div>
               </div>
