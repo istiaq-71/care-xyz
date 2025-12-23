@@ -7,6 +7,17 @@ export const dynamic = 'force-dynamic'
 // You can call this once to populate your database
 export async function GET() {
   try {
+    // Check MongoDB URI
+    if (!process.env.MONGODB_URI) {
+      return NextResponse.json(
+        { 
+          error: 'MONGODB_URI is not configured',
+          message: 'Please set MONGODB_URI in your .env.local file'
+        },
+        { status: 500 }
+      )
+    }
+
     const { default: clientPromise } = await import('@/lib/db')
     const client = await clientPromise
     const db = client.db('care')
@@ -67,6 +78,7 @@ export async function GET() {
         if (result.modifiedCount > 0) updated++
       }
       return NextResponse.json({ 
+        success: true,
         message: 'Services updated with images', 
         existing: existingServices,
         updated: updated 
@@ -76,13 +88,21 @@ export async function GET() {
     // Insert new services
     await servicesCollection.insertMany(services as any)
 
-    return NextResponse.json({ message: 'Services seeded successfully', count: services.length })
-  } catch (error) {
+    return NextResponse.json({ 
+      success: true,
+      message: 'Services seeded successfully', 
+      count: services.length 
+    })
+  } catch (error: any) {
     console.error('Error seeding services:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        success: false,
+        error: 'Internal server error',
+        message: error?.message || 'Unknown error',
+        details: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+      },
       { status: 500 }
     )
   }
 }
-
