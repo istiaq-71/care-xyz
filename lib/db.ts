@@ -8,11 +8,13 @@ let clientPromise: Promise<MongoClient>
 
 // Check if we're in build phase
 const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
-                     process.env.NEXT_PHASE === 'phase-development-build'
+                     process.env.NEXT_PHASE === 'phase-development-build' ||
+                     process.env.VERCEL === '1'
 
+// Don't throw error during build - just create a rejected promise
 if (!isBuildPhase && !process.env.MONGODB_URI) {
-  // Only throw error if not in build phase and URI is missing
-  throw new Error('Please add your Mongo URI to environment variables')
+  // Only log warning if not in build phase and URI is missing
+  console.warn('MongoDB URI not configured - will fail at runtime')
 }
 
 // MongoDB connection options to handle SSL/TLS issues
@@ -34,10 +36,23 @@ function createMongoClient() {
   // Ensure the URI has proper SSL parameters
   let connectionUri = uri
   if (connectionUri.includes('mongodb+srv://')) {
-    // Add SSL parameters if not present
-    if (!connectionUri.includes('tls=true')) {
-      const separator = connectionUri.includes('?') ? '&' : '?'
-      connectionUri = `${connectionUri}${separator}tls=true&retryWrites=true&w=majority`
+    // Add SSL parameters if not present (avoid duplicates)
+    const hasQuery = connectionUri.includes('?')
+    const params: string[] = []
+    
+    if (!connectionUri.includes('tls=true') && !connectionUri.includes('&tls=')) {
+      params.push('tls=true')
+    }
+    if (!connectionUri.includes('retryWrites=')) {
+      params.push('retryWrites=true')
+    }
+    if (!connectionUri.includes('w=majority') && !connectionUri.includes('&w=')) {
+      params.push('w=majority')
+    }
+    
+    if (params.length > 0) {
+      const separator = hasQuery ? '&' : '?'
+      connectionUri = `${connectionUri}${separator}${params.join('&')}`
     }
   }
   

@@ -69,7 +69,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.role = (user as any).role || 'user'
+        token.role = ((user as any).role as 'user' | 'admin') || 'user'
       }
       return token
     },
@@ -77,7 +77,7 @@ export const authOptions: NextAuthOptions = {
       try {
         if (session.user && token) {
           session.user.id = token.id as string
-          session.user.role = (token.role as string) || 'user'
+          session.user.role = ((token.role as 'user' | 'admin') || 'user')
           try {
             const user = await getUserByEmail(session.user.email || '')
             if (user) {

@@ -3,6 +3,9 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
-  "regions": ["bom1"]
+  "regions": ["bom1"],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
 
