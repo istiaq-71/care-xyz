@@ -5,15 +5,24 @@ import clientPromise from '@/lib/db'
 export const dynamic = 'force-dynamic'
 
 // This route allows you to make a user admin
-// In production, you should protect this route better
+// Protected with admin password
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json()
+    const { email, adminPassword } = await request.json()
     
     if (!email) {
       return NextResponse.json(
         { error: 'Email is required' },
         { status: 400 }
+      )
+    }
+
+    // Verify admin password
+    const requiredPassword = process.env.ADMIN_PASSWORD || 'admin123'
+    if (!adminPassword || adminPassword !== requiredPassword) {
+      return NextResponse.json(
+        { error: 'Invalid admin password' },
+        { status: 401 }
       )
     }
 

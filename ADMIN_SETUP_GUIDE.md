@@ -4,6 +4,19 @@
 
 Admin panel access করার জন্য আপনাকে প্রথমে একটি user account তৈরি করতে হবে, তারপর সেই user-কে admin role দিতে হবে।
 
+**⚠️ এখন admin password প্রয়োজন!** (Default: `admin123`)
+
+---
+
+## 🔐 Step 0: Admin Password Set করুন
+
+`.env.local` file-এ add করুন:
+```env
+ADMIN_PASSWORD=admin123
+```
+
+**⚠️ Production-এ strong password ব্যবহার করুন!**
+
 ---
 
 ## 📋 Step-by-Step Instructions
@@ -62,12 +75,12 @@ Admin panel access করার জন্য আপনাকে প্রথম�
 
 1. **Browser-এ এই URL visit করুন:**
    ```
-   http://localhost:3000/api/setup?email=your-email@example.com&makeAdmin=true
+   http://localhost:3000/api/setup?email=your-email@example.com&makeAdmin=true&adminPassword=admin123
    ```
    
    **উদাহরণ:**
    ```
-   http://localhost:3000/api/setup?email=istiaqhossain71@gmail.com&makeAdmin=true
+   http://localhost:3000/api/setup?email=istiaqhossain71@gmail.com&makeAdmin=true&adminPassword=admin123
    ```
 
 2. **Response দেখবেন:**

@@ -74,29 +74,40 @@ export async function GET(request: Request) {
     if (makeAdmin && email) {
       const usersCollection = db.collection('users')
       
-      // Check if any admin exists
-      const existingAdmin = await usersCollection.findOne({ role: 'admin' })
+      // Check admin password if provided
+      const adminPassword = searchParams.get('adminPassword')
+      const requiredPassword = process.env.ADMIN_PASSWORD || 'admin123'
       
-      if (existingAdmin) {
+      if (adminPassword && adminPassword !== requiredPassword) {
         results.admin = {
-          message: 'Admin already exists',
-          existingAdminEmail: existingAdmin.email,
+          message: 'Invalid admin password',
+          error: true,
         }
       } else {
-        const user = await getUserByEmail(email)
-        if (user) {
-          await usersCollection.updateOne(
-            { email },
-            { $set: { role: 'admin' } }
-          )
+        // Check if any admin exists
+        const existingAdmin = await usersCollection.findOne({ role: 'admin' })
+        
+        if (existingAdmin) {
           results.admin = {
-            message: 'User is now admin',
-            email: email,
+            message: 'Admin already exists',
+            existingAdminEmail: existingAdmin.email,
           }
         } else {
-          results.admin = {
-            message: 'User not found',
-            email: email,
+          const user = await getUserByEmail(email)
+          if (user) {
+            await usersCollection.updateOne(
+              { email },
+              { $set: { role: 'admin' } }
+            )
+            results.admin = {
+              message: 'User is now admin',
+              email: email,
+            }
+          } else {
+            results.admin = {
+              message: 'User not found',
+              email: email,
+            }
           }
         }
       }
