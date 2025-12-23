@@ -1,22 +1,28 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useRouter, usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export default function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    // Only redirect if we're sure the user is not authenticated
+    if (status === 'unauthenticated' && !isRedirecting) {
+      setIsRedirecting(true)
       // Preserve the current path as callbackUrl
-      const callbackUrl = encodeURIComponent(pathname || '/')
+      const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '')
+      const callbackUrl = encodeURIComponent(currentPath || '/')
       router.push(`/login?callbackUrl=${callbackUrl}`)
     }
-  }, [status, router, pathname])
+  }, [status, router, pathname, searchParams, isRedirecting])
 
+  // Show loading while checking session
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
@@ -28,12 +34,13 @@ export default function PrivateRoute({ children }: { children: React.ReactNode }
     )
   }
 
+  // If authenticated and session exists, show content
   if (status === 'authenticated' && session) {
     return <>{children}</>
   }
 
-  // If unauthenticated, the useEffect will redirect, but show loading while redirecting
-  if (status === 'unauthenticated') {
+  // If unauthenticated, show loading while redirecting
+  if (status === 'unauthenticated' || isRedirecting) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
         <div className="text-center">

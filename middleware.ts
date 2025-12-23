@@ -10,10 +10,18 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         // Check if user is trying to access a protected route
-        if (req.nextUrl.pathname.startsWith('/booking') || 
-            req.nextUrl.pathname.startsWith('/my-bookings') ||
-            req.nextUrl.pathname.startsWith('/admin')) {
-          return !!token
+        const pathname = req.nextUrl.pathname
+        if (pathname.startsWith('/booking') || 
+            pathname.startsWith('/my-bookings') ||
+            pathname.startsWith('/admin')) {
+          // If no token, redirect to login with callbackUrl
+          if (!token) {
+            const callbackUrl = encodeURIComponent(pathname + req.nextUrl.search)
+            const loginUrl = new URL('/login', req.url)
+            loginUrl.searchParams.set('callbackUrl', callbackUrl)
+            return false // This will trigger redirect to signIn page
+          }
+          return true
         }
         return true
       },
